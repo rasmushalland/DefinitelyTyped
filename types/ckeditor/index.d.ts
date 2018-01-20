@@ -95,6 +95,13 @@ declare namespace CKEDITOR {
 
     namespace dom {
 
+        interface bookmark {
+            startNode: dom.node | string;
+            endNode: dom.node | string;
+            serializable: boolean;
+            collapsed: boolean;
+        }
+
         class comment {
 
             // Properties
