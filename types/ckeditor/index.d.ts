@@ -274,7 +274,7 @@ declare namespace CKEDITOR {
             setValue(value: string): element;
             show(): void;
             unselectable(): void;
-
+            
             //static method
             static clearAllMarkers(database: Object): Object;
             static clearMarkers(database: Object, element: Object, removeFromDatabase: Object): void;
@@ -307,9 +307,9 @@ declare namespace CKEDITOR {
         class range {
             constructor(root: element);
             constructor(root: document);
-            startContainer: any;
+            startContainer: element | text;
             startOffset: number;
-            endContainer: any;
+            endContainer: element | text;
             endOffset: number;
             collapsed: boolean;
             isDocRoot: boolean;
@@ -323,7 +323,7 @@ declare namespace CKEDITOR {
             createBookmark(serializable?: boolean): bookmark;
             createBookmark2(normalized: boolean): Object;
             createIterator(): iterator;
-            moveToBookmark(bookmark: Object): void;
+            moveToBookmark(bookmark: bookmark): void;
             getBoundaryNodes(): { startNode: node; endNode: node; };
             getCommonAncestor(includeSelf: boolean, ignoreTextNode: boolean): element;
             optimize(): void;
@@ -332,9 +332,14 @@ declare namespace CKEDITOR {
             enlarge(unit: number, excludeBrs?: boolean): void;
             shrink(mode: number, selectContents: boolean): void;
             insertNode(node: node): void;
-            moveToPosition(node: node, position: Object): void;
+            moveToPosition(node: node, position: number): void;
             moveToRange(range: range): void;
             selectNodeContents(node: node): void;
+            optimize(): void;
+            optimizeBookmark(): void;
+            removeEmptyBlocksAtEnd(atEnd: boolean): void;
+            select(): selection;
+            selectNodeContents(node: node): selection;
             setStart(startNode: node, startOffset: number): void;
             setEnd(endNode: node, endOffset: number): void;
             setStartAfter(node: node): void;
@@ -343,7 +348,7 @@ declare namespace CKEDITOR {
             setEndAt(node: node, position: number): void;
             fixBlock(isStart: boolean, blockTag: Object): Object;
 			select(): selection;
-            splitBlock(blockTag: Object): Object;
+            splitBlock(cloneId?: boolean): void;
             splitElement(toSplit: element): element;
             removeEmptyBlocksAtEnd(atEnd: boolean): void;
             startPath(): elementPath;
@@ -351,8 +356,8 @@ declare namespace CKEDITOR {
             checkBoundaryOfElement(element: element, checkType: number): boolean;
             checkStartOfBlock(): boolean;
             checkEndOfBlock(): boolean;
-            getPreviousNode(evaluator: Function, guard: Function, boundary: element): element;
-            getNextNode(evaluator: Function, guard: Function, boundary: element): element;
+            getPreviousNode(evaluator: walkerEvaluator, guard?: walkerEvaluator, boundary?: element): element | null;
+            getNextNode(evaluator: walkerEvaluator, guard?: walkerEvaluator, boundary?: element): element | null;
             checkReadOnly(): boolean;
             moveToElementEditablePosition(element: element, isMoveToEnd: boolean): boolean;
             movetoClosestEditablePosition(element: element, isMoveToEnd: boolean): boolean;
@@ -362,7 +367,7 @@ declare namespace CKEDITOR {
             getTouchedStartNode(): node;
             getTouchedEndNode(): node;
             getNextEditableNode(): Object;
-            getPreviousEditableNode(): Object;
+            getPreviousEditableNode(): element | text;
             scrollIntoView(): void;
         }
 
@@ -380,12 +385,12 @@ declare namespace CKEDITOR {
             constructor(target: document);
             constructor(target: element);
             constructor(target: selection);
-            createBookmarks(serializable: Object): any[];
+            createBookmarks(serializable?: boolean): bookmark[];
             createBookmarks2(normalized?: Object): any[];
             fake(element: element): void;
             getCommonAncestor(): element;
             getNative(): Object;
-            getRanges(onlyEditables?: boolean): any[];
+            getRanges(onlyEditables?: boolean): range[];
             getSelectedElement(): element;
             getSelectedText(): string;
             getStartElement(): element;
@@ -395,9 +400,9 @@ declare namespace CKEDITOR {
             removeAllRanges(): void;
             reset(): void;
             scrollIntoView(): void;
-            selectBookmarks(bookmarks: any[]): selection;
+            selectBookmarks(bookmarks: bookmark[]): selection;
             selectElement(element: element): void;
-            selectRanges(ranges: any[]): void;
+            selectRanges(ranges: range[]): selection;
             unlock(restore: Object): void;
         }
 
@@ -406,7 +411,7 @@ declare namespace CKEDITOR {
             constructor(ranges: range[]);
             constructor(range: range);
             createIterator(): rangeListIterator;
-            createBokmark(serializable: boolean): Object[];
+            createBokmark(serializable: boolean): bookmark[];
             createBookmark2(normalized: boolean): Object[];
             moveToBookmark(bookmarks: Object[]): void;
         }
@@ -506,8 +511,12 @@ declare namespace CKEDITOR {
         }
 
 
+        type walkerEvaluator = { (node: node): boolean; }
         class walker {
             constructor(range: range);
+            evaluator: walkerEvaluator;
+            guard: walkerEvaluator;
+
             end(): void;
             next(): node;
             previous(): node;
@@ -517,16 +526,16 @@ declare namespace CKEDITOR {
             lastBackward(): node;
             reset(): void;
             //static methods till the end
-            blockBoundary(customNodeNames: Object): Function;
+            blockBoundary(customNodeNames: Object): walkerEvaluator;
             listItemBoundary(): Function;
-            bookmark(contentOnly?: boolean, isReject?: boolean): Function;
-            whitespaces(isReject?: boolean): Function;
-            invisible(isReject?: boolean): Function;
-            nodeType(type: number, isReject?: boolean): Function;
-            bogus(isReject?: boolean): Function;
-            temp(isReject?: boolean): Function;
-            ignored(isReject?: boolean): Function;
-            editable(isReject?: boolean): Function;
+            bookmark(contentOnly?: boolean, isReject?: boolean): walkerEvaluator;
+            whitespaces(isReject?: boolean): walkerEvaluator;
+            invisible(isReject?: boolean): walkerEvaluator;
+            nodeType(type: number, isReject?: boolean): walkerEvaluator;
+            bogus(isReject?: boolean): walkerEvaluator;
+            temp(isReject?: boolean): walkerEvaluator;
+            ignored(isReject?: boolean): walkerEvaluator;
+            editable(isReject?: boolean): walkerEvaluator;
         }
 
     }
