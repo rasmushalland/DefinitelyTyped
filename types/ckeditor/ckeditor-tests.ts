@@ -261,6 +261,10 @@ function test_dom_range() {
     alert(range.collapsed);
     range.selectNodeContents(range.document.getBody());
     range.selectNodeContents(editor.document.getBody());
+    if (range.endContainer instanceof CKEDITOR.dom.text)
+        return;
+    if (range.startContainer instanceof CKEDITOR.dom.text)
+        return;
     alert(range.endContainer.getName());
     range.selectNodeContents(editor.document.getBody());
     alert(range.endOffset);

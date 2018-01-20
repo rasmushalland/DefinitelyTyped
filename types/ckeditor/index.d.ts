@@ -450,6 +450,7 @@ declare namespace CKEDITOR {
             getAscendant(reference: string, includeSelf?: boolean): node;
             hasAscendant(name: Object, includeSelf: any): boolean;
             move(preserveChildren?: boolean): node;
+            remove(preserveChildren?: boolean): this;
             replace(nodeToReplace: node): void;
             trim(): void;
             ltrim(): void;
@@ -884,7 +885,7 @@ declare namespace CKEDITOR {
 
     class style {
 		constructor(something: { element: string, attributes: { [att: string]: string } });
-		applyToRange(range: Range, editor: editor): void;
+		applyToRange(range: dom.range, editor: editor): void;
 	}
 
     interface editable extends dom.element {
